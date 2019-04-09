@@ -10,5 +10,5 @@ Ho/Ant Project (Movie)
  
  
  # BackEnd 
- - NodeJS (Crawling + Was)
+ - NodeJS (Express.js + Crawling + Was)
  - DB (MongoDB)
