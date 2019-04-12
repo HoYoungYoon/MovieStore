@@ -2,7 +2,6 @@ import { createBottomTabNavigator, createAppContainer } from "react-navigation";
 import MoviesScreen from '../screens/Movies';
 import TVScreen from '../screens/TV';
 import SearchScreen from '../screens/Search';
-import BG_COLOR from '../constants/Color'
 import TabBarIcon from '../components/TabBarIcon'
 import { Platform } from 'react-native'
 import React from 'react';
