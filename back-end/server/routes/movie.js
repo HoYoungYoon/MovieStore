@@ -68,7 +68,6 @@ router.get('/', function(req, res) {
 
             // save
             if(find_cnt == 0){
-                console.log( "save" + save_cnt );
                 let promise = new Promise((resolve, reject) => {
                     mongoose.connection.db.eval("getNextSequence('movie')", (err, rst) => {
                         if(err)
@@ -97,7 +96,6 @@ router.get('/', function(req, res) {
             }
             // modify
             else{
-                console.log( 'update' + update_cnt );
                 Movie.update({
                     'kor_title': movie.kor_title,
                     'naver_link': movie.naver_link
