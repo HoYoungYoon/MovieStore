@@ -23,7 +23,8 @@ const movieSchema = new Schema({
     daum_rating: Number,
 
     write_time: Date,
-    update_time: Date
+    update_time: Date,
+    opening_pre: Boolean
 });
 
 mongoose.model('Movie', movieSchema);
