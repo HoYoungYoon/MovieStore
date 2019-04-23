@@ -3,7 +3,8 @@ var { buildSchema } = require('graphql');
 
 var schema = buildSchema(`
     type Query {
-        movies : [Movie]
+        movies : [Movie],
+        movie(kor_title: String!): Movie
     }
 
     type Movie {
@@ -37,6 +38,10 @@ var resolver = {
     movies: async (args, context, info) => {
         return await dao.movie.getAllMovies();
     },
+    movie: async (args, context, info) => {
+        const {kor_title} = args;
+        return await dao.movie.getMovie(kor_title);
+    }
 };
 
 module.exports = {schema: schema, root: resolver};
