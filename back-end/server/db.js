@@ -9,5 +9,5 @@ module.exports = () => {
 
     connect();
     mongoose.connection.on('disconnected', connect);
-    require('./models/movie.js');
+    require('./models/schema/movie.js');
 };

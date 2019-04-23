@@ -10,7 +10,7 @@ const request = require('request');
 const cheerio = require('cheerio');
 
 const mongoose = require('mongoose');
-const Movie = require('../models/movie');
+const Movie = require('../models/schema/movie');
 
 router.get('/', function(req, res) {
     let url = 'https://movie.naver.com/movie/running/current.nhn';
