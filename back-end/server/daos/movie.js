@@ -6,7 +6,7 @@ module.exports = (function(){
     }
 
     async function getMovie(kor_title){
-        return await model.Movie.findOne({kor_title: kor_title}); // 없을땐 null
+        return await model.Movie.findOne({kor_title: {$regex : kor_title}}); // 없을땐 null, 부분 일치
       }
     
 

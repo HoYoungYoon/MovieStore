@@ -16,6 +16,7 @@ module.exports = function(mongoose){
         preview_url: String,
         naver_link: String,
         booking_rate: Number,
+        total_audience: String,
 
         cgv_rating: Number,
         daum_rating: Number,

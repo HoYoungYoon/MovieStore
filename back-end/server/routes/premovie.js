@@ -38,12 +38,12 @@ router.get('/', function(req, res) {
         
             let genre = tmp[0];
             let show_time = "";
-            if( (tmp[1] !== undefined) && (tmp[1].search("분") == true))
+            if( (tmp[1] !== undefined) && (tmp[1].indexOf("분") !== -1))
                 show_time = tmp[1].replace("분", "");
                
             let opening_date = "";
-            if((tmp[2] !== undefined) && (tmp[2].search("개봉") == true))
-                opening_date = tmp[2].replace("개봉", "");    
+            if((tmp[2] !== undefined) && (tmp[2].indexOf("개봉") !== -1))
+                opening_date = tmp[2].replace("개봉", "");
             
             let movie_director = $(nml[i]).find('.lst_dsc > dd').eq(1).find('.info_txt1 dd').eq(1).find('.link_txt > a').text();
             let movie_stars = $(nml[i]).find('.lst_dsc > dd').eq(1).find('.info_txt1 dd').eq(2).text().replace(/\s/gi, "").replace(",", ", ");
