@@ -17,6 +17,7 @@ const model = require('../models/model');
 // https://programmingsummaries.tistory.com/399
 const doAsync = fn => async (req, res, next) => await fn(req, res, next).catch(next);
 
+// function find
 const find = (movie) => {
     return new Promise((resolve, reject) => {
         model.Movie.find({
@@ -32,26 +33,67 @@ const find = (movie) => {
     });
 };
 
+// function detail
 const detail = (naver_link) => {
+    let rst = [];
     return new Promise((resolve, reject) => {
-        request(naver_link, async function(error, response, body) {
+        request(naver_link, function(error, response, body) {
             let $ = cheerio.load(body);
-            let rst = [];
 
             if(error)
                 reject(error);
-            else{
-                rst.eng_title = $('.mv_info_area > .mv_info > .h_movie2').text().replace(/\s/gi, "");
-                rst.naver_audience_rating = $('.mv_info_area > .mv_info > .main_score').find('.ntz_score > .star_score > em').text();
-                rst.naver_journalist_rating = $('.mv_info_area > .mv_info > .main_score').find('.spc > .star_score > em').text();
-                rst.movie_plot = $('.story_area > .con_tx').text();
-                rst.total_audience = $('.step9_cont > .count').text();
-                resolve(rst);
+
+            rst.eng_title = $('.mv_info_area > .mv_info > .h_movie2').text().replace(/\s/gi, "");
+            rst.naver_audience_rating = $('.mv_info_area > .mv_info > .main_score').find('.ntz_score > .star_score > em').text();
+            rst.naver_journalist_rating = $('.mv_info_area > .mv_info > .main_score').find('.spc > .star_score > em').text();
+            rst.movie_plot = $('.story_area > .con_tx').text();
+            rst.total_audience = $('.step9_cont > .count').text();
+            resolve(rst);
+
+        }); // End detail request
+    })
+};
+
+// function get preview url
+const get_preview_url = (naver_link) => {
+    let preview_arr = [];
+    return new Promise((resolve, reject) => {
+        let code = naver_link.split('=')[1];
+        request('https://movie.naver.com/movie/bi/mi/media.nhn?code=' + code, function(error, response, body) {
+            if(error)
+                reject(error);
+
+            let $ = cheerio.load(body);
+            let ifr_length = $('.ifr_trailer > .ifr_area > ul > li').length;
+
+            for(let i = 0; i < ifr_length; i++){
+                let tmp = $('.ifr_trailer > .ifr_area > ul > li').eq(i).children('a');
+                let preview_title = tmp.attr('title');
+                let preview_url = tmp.attr('href');
+
+                preview_arr[i] = {'preview_title': preview_title, 'preview_url': preview_url};
             }
+            resolve(preview_arr);
+        }); // End media request
+    });
+};
+
+// function get preview
+const get_preview = (naver_link) => {
+    return new Promise((resolve, reject) => {
+        request('https://movie.naver.com' + naver_link, function(error, response, body) {
+            if(error)
+                reject(error);
+
+            let $ = cheerio.load(body);
+            let ifr = $('._videoPlayer');
+
+            resolve( ifr.attr('src') );
         });
     });
 };
 
+// function save
 const save = () => {
     return new Promise((resolve, reject) => {
         mongoose.connection.db.eval("getNextSequence('movie')", (err, rst) => {
@@ -63,6 +105,7 @@ const save = () => {
     });
 };
 
+// function update
 const update = (movie) => {
     return new Promise((resolve, reject) => {
         model.Movie.updateOne(
@@ -142,12 +185,30 @@ const crawling = async () => {
                     })
                     .catch(err => console.error(err));
 
+                // 예고편 가져오기
+                let preview = [];
+                await get_preview_url(naver_link)
+                    .then(async (result) => {
+                        for(let y = 0; y < result.length; y++){
+                            await get_preview(result[y].preview_url)
+                                .then((src) => {
+                                    preview[y] = {'preview_title': result[y].preview_title, 'preview_url': src};
+                                })
+                                .catch(err => console.error(err));
+                        }
+                        movie.preview = preview;
+                    })
+                    .catch(err => console.error(err));
+
+                // db 에 있는지 검색
                 let find_cnt = '';
                 await find(movie)
                     .then( result => find_cnt = result)
                     .catch(err => reject(err));
 
+                // save
                 if(find_cnt == 0){
+                    console.log('save');
                     await save()
                         .then((result) => {
                             movie.idx = result;
@@ -156,7 +217,10 @@ const crawling = async () => {
                                 .catch(err => reject(err));
                         })
                         .catch(err => console.error(err));
-                }else{
+                }
+                // update
+                else{
+                    console.log('update');
                     await update(movie)
                         .then((result) => {
                             if(result === 'success')
@@ -165,6 +229,7 @@ const crawling = async () => {
                         .catch(err => reject(err));
                 }
 
+                // 마지막에 count resolve
                 if(i == nml.length - 1){
                     resolve({
                         'save_cnt' : save_cnt,

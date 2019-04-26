@@ -13,7 +13,7 @@ module.exports = function(mongoose){
         naver_audience_rating: Number,
         naver_journalist_rating: Number,
         poster_url: String,
-        preview_url: String,
+        preview: [],
         naver_link: String,
         booking_rate: Number,
         total_audience: String,
