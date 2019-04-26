@@ -115,6 +115,7 @@ const update = (movie) => {
                 'naver_journalist_rating': movie.naver_journalist_rating,
                 'booking_rate': movie.booking_rate,
                 'total_audience': movie.total_audience,
+                'preview': movie.preview,
                 'update_time': moment().format('YYYY-MM-DD HH:mm:ss')
             }
         }, function (err, result) {
