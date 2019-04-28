@@ -13,7 +13,7 @@ db();
 // routes
 const index    = require('./routes/index');
 const movie    = require('./routes/movie');
-const premovie = require('./routes/premovie');
+
 const app = express();
 
 // view engine setup
@@ -33,7 +33,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use('/movie', movie);
-app.use('/premovie', premovie);
+
 
 // graphql
 const {schema, root} = require('./graphql/schema');

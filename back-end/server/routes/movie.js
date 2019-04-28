@@ -13,11 +13,18 @@ const cheerio = require('cheerio');
 const mongoose = require('mongoose');
 const model = require('../models/model');
 
+const MOVIE_URL = 'https://movie.naver.com/movie/running/current.nhn';
+const PREMOVIE_URL = 'https://movie.naver.com/movie/running/premovie.nhn';
+
+
 // async 라우팅 핸들러를 사용할 수 있는 두 가지 방법 중 1 (데코레이터 패턴)
 // https://programmingsummaries.tistory.com/399
 const doAsync = fn => async (req, res, next) => await fn(req, res, next).catch(next);
 
-// function find
+/** DB FIND
+ * 
+ * @param {*} movie 
+ */
 const find = (movie) => {
     return new Promise((resolve, reject) => {
         model.Movie.find({
@@ -33,7 +40,11 @@ const find = (movie) => {
     });
 };
 
-// function detail
+
+/** function detail - 영화 상세 정보 크롤링 
+ * 
+ * @param {*} naver_link 
+ */
 const detail = (naver_link) => {
     let rst = [];
     return new Promise((resolve, reject) => {
@@ -54,7 +65,10 @@ const detail = (naver_link) => {
     })
 };
 
-// function get preview url
+/** 예고편 영상 링크 크롤링
+ * 
+ * @param {*} naver_link 
+ */
 const get_preview_url = (naver_link) => {
     let preview_arr = [];
     return new Promise((resolve, reject) => {
@@ -78,7 +92,10 @@ const get_preview_url = (naver_link) => {
     });
 };
 
-// function get preview
+/** 예고편 클롤링
+ *  
+ * @param {*} naver_link 
+ */
 const get_preview = (naver_link) => {
     return new Promise((resolve, reject) => {
         request('https://movie.naver.com' + naver_link, function(error, response, body) {
@@ -93,7 +110,9 @@ const get_preview = (naver_link) => {
     });
 };
 
-// function save
+/** DB SAVE
+ * 
+ */
 const save = () => {
     return new Promise((resolve, reject) => {
         mongoose.connection.db.eval("getNextSequence('movie')", (err, rst) => {
@@ -105,7 +124,10 @@ const save = () => {
     });
 };
 
-// function update
+/** DB UPDATE
+ * 
+ * @param {*} movie 
+ */
 const update = (movie) => {
     return new Promise((resolve, reject) => {
         model.Movie.updateOne(
@@ -128,9 +150,12 @@ const update = (movie) => {
     });
 };
 
-const crawling = async () => {
+/** 크롤링 시작
+ *  
+ * @param {*} url - 크롤링 URL 
+ */
+const crawling = async (url) => {
     return new Promise((resolve, reject) => {
-        let url = 'https://movie.naver.com/movie/running/current.nhn';
         let save_cnt = 0;
         let update_cnt = 0;
 
@@ -173,8 +198,7 @@ const crawling = async () => {
                 movie.movie_director= movie_director;
                 movie.movie_stars   = movie_stars;
                 movie.write_time    = moment().format('YYYY-MM-DD HH:mm:ss');
-                movie.update_time   = moment().format('YYYY-MM-DD HH:mm:ss');
-
+                movie.update_time   = moment().format('YYYY-MM-DD HH:mm:ss');            
                 // detail 정보 가져오기
                 await detail(naver_link)
                     .then((result) => {
@@ -248,13 +272,20 @@ const crawling = async () => {
 
 router.get('/', doAsync(async function(req, res) {
 
-    await crawling()
+    await crawling(MOVIE_URL)
         .then((result) => {
             res.json(result);
-            console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
+            console.log("MOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
         })
-        .catch(err => console.error(err));
+        .catch(err => console.error("MOVIE_URL",err));
 
+    await crawling(PREMOVIE_URL)
+        .then((result) => {
+            res.json(result);
+            console.log("PREMOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
+        })
+        .catch(err => console.error("PREMOVIE_URL",err));
+    
 }));
 
 module.exports = router;
