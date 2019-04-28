@@ -1,6 +1,7 @@
 const createError   = require('http-errors');
 const express       = require('express');
 const path          = require('path');
+const cors          = require('cors');
 const cookieParser  = require('cookie-parser');
 const logger        = require('morgan');
 const graphqlHTTP   = require('express-graphql');
@@ -13,7 +14,6 @@ db();
 // routes
 const index    = require('./routes/index');
 const movie    = require('./routes/movie');
-
 const app = express();
 
 // view engine setup
@@ -28,15 +28,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Origin', "*");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
 app.use('/movie', movie);
 
-
 // graphql
 const {schema, root} = require('./graphql/schema');
+app.use(cors());
 app.use('/graphql', graphqlHTTP({
   schema: schema,
   rootValue: root,
