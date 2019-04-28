@@ -271,21 +271,26 @@ const crawling = async (url) => {
 };
 
 router.get('/', doAsync(async function(req, res) {
-
-    await crawling(MOVIE_URL)
-        .then((result) => {
-            res.json(result);
-            console.log("MOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
-        })
-        .catch(err => console.error("MOVIE_URL",err));
+    
+    let lstResult = [];
 
     await crawling(PREMOVIE_URL)
         .then((result) => {
-            res.json(result);
+            lstResult['preMovie'] = result;
             console.log("PREMOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
         })
         .catch(err => console.error("PREMOVIE_URL",err));
+
+    await crawling(MOVIE_URL)
+        .then((result) => {
+            lstResult['Movie'] = result;
+            console.log(lstResult);
+            res.json(lstResult);
+            console.log("MOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
+        })
+        .catch(err => console.error("MOVIE_URL",err));
     
+        
 }));
 
 module.exports = router;
