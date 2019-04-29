@@ -16,7 +16,6 @@ const model = require('../models/model');
 const MOVIE_URL = 'https://movie.naver.com/movie/running/current.nhn';
 const PREMOVIE_URL = 'https://movie.naver.com/movie/running/premovie.nhn';
 
-
 // async 라우팅 핸들러를 사용할 수 있는 두 가지 방법 중 1 (데코레이터 패턴)
 // https://programmingsummaries.tistory.com/399
 const doAsync = fn => async (req, res, next) => await fn(req, res, next).catch(next);
@@ -155,6 +154,7 @@ const update = (movie) => {
  * @param {*} url - 크롤링 URL 
  */
 const crawling = async (url) => {
+    let start_time = moment();
     return new Promise((resolve, reject) => {
         let save_cnt = 0;
         let update_cnt = 0;
@@ -233,7 +233,6 @@ const crawling = async (url) => {
 
                 // save
                 if(find_cnt == 0){
-                    console.log('save');
                     await save()
                         .then((result) => {
                             movie.idx = result;
@@ -245,7 +244,6 @@ const crawling = async (url) => {
                 }
                 // update
                 else{
-                    console.log('update');
                     await update(movie)
                         .then((result) => {
                             if(result === 'success')
@@ -256,9 +254,16 @@ const crawling = async (url) => {
 
                 // 마지막에 count resolve
                 if(i == nml.length - 1){
+                    let end_time = moment();
+                    let diffTime = {
+                        minute: end_time.diff(start_time, 'minutes'),
+                        second: end_time.diff(start_time, 'seconds')
+                    };
+
                     resolve({
                         'save_cnt' : save_cnt,
-                        'update_cnt' : update_cnt
+                        'update_cnt' : update_cnt,
+                        'elapsed_time' : diffTime.second + 's'
                     });
                 }
 
@@ -276,21 +281,20 @@ router.get('/', doAsync(async function(req, res) {
 
     await crawling(PREMOVIE_URL)
         .then((result) => {
-            lstResult['preMovie'] = result;
-            console.log("PREMOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
+            lstResult.push({"pre_movie" : result});
+            console.log("Complete PreMovie Crawling : ", moment().format('YYYY-MM-DD HH:mm:ss'));
         })
         .catch(err => console.error("PREMOVIE_URL",err));
 
     await crawling(MOVIE_URL)
         .then((result) => {
-            lstResult['Movie'] = result;
+            lstResult.push({"movie" : result});
+            console.log("Complete Movie Crawling : ", moment().format('YYYY-MM-DD HH:mm:ss'));
+
             console.log(lstResult);
-            res.json(lstResult);
-            console.log("MOVIE_URL", moment().format('YYYY-MM-DD HH:mm:ss'));
+            res.set({'Content-Type': 'application/json; charset=utf-8'}).send(200, JSON.stringify(lstResult, null, 4));
         })
         .catch(err => console.error("MOVIE_URL",err));
-    
-        
 }));
 
 module.exports = router;

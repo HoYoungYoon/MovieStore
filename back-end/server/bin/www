@@ -20,6 +20,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+server.setTimeout(300000); // default 120000 (2 minutes)
 
 /**
  * Listen on provided port, on all network interfaces.
