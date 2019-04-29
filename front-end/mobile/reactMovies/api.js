@@ -1,4 +1,8 @@
 import axios from 'axios'
+import { HttpLink, InMemoryCache } from 'apollo-client-preset';
+import gql from 'graphql-tag';
+import ApolloClient from 'apollo-client';
+
 
 const api = axios.create({
     baseURL: 'https://api.themoviedb.org/3/',
@@ -7,6 +11,47 @@ const api = axios.create({
         'language' : 'ko',       
     }
 });
+
+// Apollo client
+export const graphClient = new ApolloClient({
+    link: new HttpLink({ uri: 'http://localhost:5000/graphql' }),
+    cache: new InMemoryCache().restore({}),
+});
+
+export const MOVIE_QUERY = gql`
+query{
+    movies{
+    idx
+    kor_title
+    eng_title
+    genre
+    show_time
+    opening_date
+    movie_director
+    movie_stars
+    movie_rating
+    movie_plot
+    naver_audience_rating
+    naver_journalist_rating
+    poster_url
+    preview:
+    naver_link
+    booking_rate
+    total_audience
+    cgv_rating
+    daum_rating
+    write_time
+    update_time
+    opening_pre
+    }
+  }
+  `;
+
+   
+  
+
+
+
 
 // https://developers.themoviedb.org/3/search/search-movies 참고 
 // Movie API 
