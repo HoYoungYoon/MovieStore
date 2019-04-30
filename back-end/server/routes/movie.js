@@ -263,7 +263,8 @@ const crawling = async (url) => {
                     resolve({
                         'save_cnt' : save_cnt,
                         'update_cnt' : update_cnt,
-                        'elapsed_time' : diffTime.second + 's'
+                        'elapsed_time' : diffTime.second + 's',
+                        'complete_time' : moment().format('YYYY-MM-DD HH:mm:ss')
                     });
                 }
 
@@ -282,14 +283,14 @@ router.get('/', doAsync(async function(req, res) {
     await crawling(PREMOVIE_URL)
         .then((result) => {
             lstResult.push({"pre_movie" : result});
-            console.log("Complete PreMovie Crawling : ", moment().format('YYYY-MM-DD HH:mm:ss'));
+            // console.log("Complete PreMovie Crawling : ", moment().format('YYYY-MM-DD HH:mm:ss'));
         })
         .catch(err => console.error("PREMOVIE_URL",err));
 
     await crawling(MOVIE_URL)
         .then((result) => {
             lstResult.push({"movie" : result});
-            console.log("Complete Movie Crawling : ", moment().format('YYYY-MM-DD HH:mm:ss'));
+            // console.log("Complete Movie Crawling : ", moment().format('YYYY-MM-DD HH:mm:ss'));
 
             console.log(lstResult);
             res.set({'Content-Type': 'application/json; charset=utf-8'}).send(200, JSON.stringify(lstResult, null, 4));
