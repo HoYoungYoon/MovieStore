@@ -1,35 +1,32 @@
 module.exports = {
   /**
-   * Application configuration section
-   * http://pm2.keymetrics.io/docs/usage/application-declaration/
+   * 앱 설정
    */
-  apps : [
+  apps: [
     {
-      name      : 'reactweb',
-      script    : 'npm',
-      args      : 'run start:production',
-      env_production : {
-        NODE_ENV: 'production'
+      name: 'reactweb',
+      script: './App.js', // 앱 실행 스크립트
+      instances: 4, // 앱 인스턴스의 수
+      exec_mode: 'cluster', // 실행 모드.
+      env: { // 환경변수. 모든 배포 환경에서 공통으로 사용한다.
+        NODE_ENV: 'production',
       }
     },
   ],
 
   /**
-   * Deployment section
-   * http://pm2.keymetrics.io/docs/usage/deployment/
+   * 배포 설정
    */
-  deploy : {
-    production : {},
+  deploy: {
     staging: {
-      user: 'jaeuk',
-      host: 'localhost',
-      ref: 'origin/master',
-      repo: 'git@github.com:HoYoungYoon/MovieStore.git',
-      path: '/root/MovieStore/front-end/web/reactweb',
-      key: '/absolute/path/to/key',
-      ssh_options: ['ForwardAgent=yes'],
-      'post-deploy': 'npm install && pm2 reload app.config.js --env production'
+      user: 'root', // 접속할 계정. SSH를 사용해서 서버에 접속할 수 있어야 한다.
+      host: '115.68.230.30', // 서버 도메인 또는 IP
+      ref: 'origin/dev_ant', // 서버에서 clone할 브랜치
+      repo: 'git@github.com:HoYoungYoon/MovieStore.git', // Git 저장소 URL
+      ssh_options: 'StrictHostKeyChecking=no', // SSH 접속 옵션.
+      path: '/root/MovieStore/front-end/web/reactweb', // 앱을 설치할 폴더 위치
+      'post-deploy': // PM2가 배포(git clone)한 후 실행할 명령어
+          'npm install && npm run build && pm2 reload app.config.js'
     },
-    dev : {}
-  }
+  },
 };
