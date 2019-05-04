@@ -21,7 +21,7 @@ var schema = buildSchema(`
         naver_audience_rating: Float,
         naver_journalist_rating: Float,
         poster_url: String,
-        preview: String,
+        preview: [preview],
         naver_link: String,
         booking_rate: Float,
         total_audience: String,
@@ -32,6 +32,11 @@ var schema = buildSchema(`
         write_time: String,
         update_time: String,
         opening_pre: Boolean
+    }
+    
+    type preview {
+        preview_title: String,
+        preview_url: String
     }
 `);
 
