@@ -200,57 +200,63 @@ const crawling = async (url) => {
                 movie.write_time    = moment().format('YYYY-MM-DD HH:mm:ss');
                 movie.update_time   = moment().format('YYYY-MM-DD HH:mm:ss');            
                 // detail 정보 가져오기
-                await detail(naver_link)
-                    .then((result) => {
-                        movie.eng_title = result.eng_title;
-                        movie.naver_audience_rating = result.naver_audience_rating;
-                        movie.naver_journalist_rating = result.naver_journalist_rating;
-                        movie.movie_plot = result.movie_plot;
-                        movie.total_audience = result.total_audience;
-                    })
-                    .catch(err => console.error(err));
+                // await detail(naver_link)
+                //     .then((result) => {
+                //         movie.eng_title = result.eng_title;
+                //         movie.naver_audience_rating = result.naver_audience_rating;
+                //         movie.naver_journalist_rating = result.naver_journalist_rating;
+                //         movie.movie_plot = result.movie_plot;
+                //         movie.total_audience = result.total_audience;
+                //     })
+                //     .catch(err => console.error(err));
+                //
+                // // 예고편 가져오기
+                // let preview = [];
+                // await get_preview_url(naver_link)
+                //     .then(async (result) => {
+                //         for(let y = 0; y < result.length; y++){
+                //             await get_preview(result[y].preview_url)
+                //                 .then((src) => {
+                //                     preview[y] = {'preview_title': result[y].preview_title, 'preview_url': src};
+                //                 })
+                //                 .catch(err => console.error(err));
+                //         }
+                //         movie.preview = preview;
+                //     })
+                //     .catch(err => console.error(err));
+                //
+                // // db 에 있는지 검색
+                // let find_cnt = '';
+                // await find(movie)
+                //     .then( result => find_cnt = result)
+                //     .catch(err => reject(err));
+                //
+                // // save
+                // if(find_cnt == 0){
+                //     await save()
+                //         .then((result) => {
+                //             movie.idx = result;
+                //             movie.save()
+                //                 .then( save_cnt++ )
+                //                 .catch(err => reject(err));
+                //         })
+                //         .catch(err => console.error(err));
+                // }
+                // // update
+                // else{
+                //     await update(movie)
+                //         .then((result) => {
+                //             if(result === 'success')
+                //                 update_cnt++;
+                //         })
+                //         .catch(err => reject(err));
+                // }
+                console.log( movie.kor_title +  "현재시간 : " + moment().valueOf() + " / 개봉일 : " + moment(movie.opening_date).valueOf());
+                if( moment().valueOf() > moment(movie.opening_date).valueOf() )
+                    console.log("개봉");
+                else
+                    console.log("미개봉");
 
-                // 예고편 가져오기
-                let preview = [];
-                await get_preview_url(naver_link)
-                    .then(async (result) => {
-                        for(let y = 0; y < result.length; y++){
-                            await get_preview(result[y].preview_url)
-                                .then((src) => {
-                                    preview[y] = {'preview_title': result[y].preview_title, 'preview_url': src};
-                                })
-                                .catch(err => console.error(err));
-                        }
-                        movie.preview = preview;
-                    })
-                    .catch(err => console.error(err));
-
-                // db 에 있는지 검색
-                let find_cnt = '';
-                await find(movie)
-                    .then( result => find_cnt = result)
-                    .catch(err => reject(err));
-
-                // save
-                if(find_cnt == 0){
-                    await save()
-                        .then((result) => {
-                            movie.idx = result;
-                            movie.save()
-                                .then( save_cnt++ )
-                                .catch(err => reject(err));
-                        })
-                        .catch(err => console.error(err));
-                }
-                // update
-                else{
-                    await update(movie)
-                        .then((result) => {
-                            if(result === 'success')
-                                update_cnt++;
-                        })
-                        .catch(err => reject(err));
-                }
 
                 // 마지막에 count resolve
                 if(i == nml.length - 1){

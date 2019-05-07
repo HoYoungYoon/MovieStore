@@ -32,11 +32,12 @@ export const all_movie = gql`
     }
 `;
 
-export const Detail_PAGE = gql`
+export const one_movie = gql`
     query{
-        movie(kore_title: "생일"){
+        movie(kor_title: "생일"){
             idx
             kor_title
+            poster_url
         }
     }
 `;
