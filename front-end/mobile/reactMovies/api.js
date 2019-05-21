@@ -3,15 +3,6 @@ import { HttpLink, InMemoryCache } from 'apollo-client-preset';
 import gql from 'graphql-tag';
 import ApolloClient from 'apollo-client';
 
-
-const api = axios.create({
-    baseURL: 'https://api.themoviedb.org/3/',
-    params:{
-        'api_key' : 'd1b891db56a09895f5ce89642d40316d',
-        'language' : 'ko',       
-    }
-});
-
 // Apollo client
 export const graphClient = new ApolloClient({
     link: new HttpLink({ uri: 'http://localhost:5000/graphql' }),
@@ -50,7 +41,15 @@ query{
    
   
 
+// Axios API 연습 
 
+const api = axios.create({
+    baseURL: 'https://api.themoviedb.org/3/',
+    params:{
+        'api_key' : 'd1b891db56a09895f5ce89642d40316d',
+        'language' : 'ko',       
+    }
+});
 
 
 // https://developers.themoviedb.org/3/search/search-movies 참고 
